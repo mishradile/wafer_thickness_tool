@@ -13,7 +13,15 @@ For plotting wafer thickness given CSV files
 - If Python has been installed in your computer, you need to proceed to install the required Python libraries that is needed to run the script. In the command line, type `cd %HOMEPATH%/Desktop/AFMTOOL-main/AFMTOOL` and press Enter. After that, type `pip install -r requirements.txt` and wait for installation to be completed.
 - If no error messages appeared on the terminal, you have successfully installed the packages needed to run the script, please refer to Usage section below on how to run the script. 
 
+## Troubleshooting
+- If after entering `pip install -r requirements.txt` there's an error message `'pip' is not recognized as an internal or external command`, try the following:
+  - Download Python again (or clicking the existing installation exe file which has been used to download Python and then clicking “Customize installation”), and checking that the “pip” checkbox is ticked to set the path for pip.
+![pythoninstall](https://user-images.githubusercontent.com/105037297/175252187-2681279f-16b6-4e63-a583-1d06caa34270.PNG)
+  - If the above doesn't work, you can set the PATH element from Window's cmd line: enter `setx PATH "%PATH%;C:\Python34\Scripts”`. After hitting enter, close the current terminal. Open a new terminal and try running `pip install -r requirements.txt` again. 
+
 ## Usage
 
 https://user-images.githubusercontent.com/105037297/177476376-20421ca0-2e59-4b12-9ef8-6c4915e5fc17.mp4
+
+
 
