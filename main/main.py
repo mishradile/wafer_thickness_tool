@@ -77,6 +77,8 @@ for ws in wb.worksheets:
         image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
         plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
+
+print("Images generated successfully. View results in /images/ folder.")
         
 
 
