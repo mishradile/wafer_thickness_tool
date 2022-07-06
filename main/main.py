@@ -21,6 +21,7 @@ else:
         os.remove(os.path.join("./images/", f))   
 
 for ws in wb.worksheets:
+    print("Working on "+str(ws)+" ...")
     #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
     var_num = int(ws.max_column-2)
 
@@ -52,7 +53,7 @@ for ws in wb.worksheets:
         im = plt.imshow(grid_data.T, extent=(min(points.iloc[:,0])-10,max(points.iloc[:,0])+10,min(points.iloc[:,1])-10,max(points.iloc[:,1])+10), origin='lower', cmap = 'jet')
         im.set_clip_path(new_circle)
         #Format colorbar to show values to 2 d.p
-        plt.colorbar(format = '%1.1f')
+        plt.colorbar(format = '%1.1f', shrink =0.75)
         
         #Adding text to plot
         avg = "{:.2f}".format(np.mean(values, axis=0))
@@ -62,9 +63,9 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-140, -170, avg_string, fontsize=13)
-        ax.text(-140, -190, rng_string, fontsize=13)
-        ax.text(-140, -210, onesig_string, fontsize=13)
+        ax.text(-150, -160, avg_string, fontsize=10, fontweight = 'bold')
+        ax.text(-30, -160, rng_string, fontsize=10, fontweight = 'bold')
+        ax.text(90, -160, onesig_string, fontsize=10, fontweight = 'bold')
         #Display height above each data point
         for index, row in points.iterrows():
             ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=5)
