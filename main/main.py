@@ -41,7 +41,7 @@ for ws in wb.worksheets:
         #https://docs.scipy.org/doc/scipy/tutorial/interpolate.html
         grid_x, grid_y = np.mgrid[min(df.iloc[:,-2]):max(df.iloc[:,-2]):200j, min(df.iloc[:,-1]):max(df.iloc[:,-1]):200j]
         
-        grid_data= griddata(points, values, (grid_x, grid_y), method='cubic')
+        grid_data= griddata(points, values, (grid_x, grid_y), method='cubic', rescale=True)
         
         fig, ax = plt.subplots(figsize=(6, 6))
         
