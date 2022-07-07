@@ -8,9 +8,6 @@ from statistics import stdev
 import os
 import re
 from matplotlib.patches import Circle
-circle = Circle((0, 0), 150, facecolor='none',
-             edgecolor=(0, 0, 0), linewidth=2, alpha=0.5)
-
 
 wb = openpyxl.load_workbook("./data.xlsx")
 #Create image directory to store produced images
@@ -30,13 +27,19 @@ for ws in wb.worksheets:
    
     points = df.iloc[:,-2:]
     
+    #Circle for cropping image, take radius to be furthest distance of any point from origin, to make sure circle fits for all data sets
+    radius_list = (points.iloc[:,0]**2 + points.iloc[:,1]**2)**(0.5)
+    circle = Circle((0, 0), max(radius_list)+5, facecolor='none',
+             edgecolor=(0, 0, 0), linewidth=2, alpha=0.5)
+
+    
     #Loop through each column
     for col_no in range(var_num):
         values = df.iloc[:,col_no]
 
         
         #https://docs.scipy.org/doc/scipy/tutorial/interpolate.html
-        grid_x, grid_y = np.mgrid[0:1:100j, 0:1:100j]
+        grid_x, grid_y = np.mgrid[min(df.iloc[:,-2]):max(df.iloc[:,-2]):200j, min(df.iloc[:,-1]):max(df.iloc[:,-1]):200j]
         
         grid_data= griddata(points, values, (grid_x, grid_y), method='cubic')
         
@@ -53,7 +56,7 @@ for ws in wb.worksheets:
         im = plt.imshow(grid_data.T, extent=(min(points.iloc[:,0])-10,max(points.iloc[:,0])+10,min(points.iloc[:,1])-10,max(points.iloc[:,1])+10), origin='lower', cmap = 'jet')
         im.set_clip_path(new_circle)
         #Format colorbar to show values to 2 d.p
-        plt.colorbar(format = '%1.1f', shrink =0.75)
+        plt.colorbar(format = '%1.0f', shrink =0.75)
         
         #Adding text to plot
         avg = "{:.2f}".format(np.mean(values, axis=0))
@@ -63,9 +66,9 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-150, -160, avg_string, fontsize=10, fontweight = 'bold')
-        ax.text(-30, -160, rng_string, fontsize=10, fontweight = 'bold')
-        ax.text(90, -160, onesig_string, fontsize=10, fontweight = 'bold')
+        ax.text(-150, -170, avg_string, fontsize=10, fontweight = 'bold')
+        ax.text(-30, -170, rng_string, fontsize=10, fontweight = 'bold')
+        ax.text(90, -170, onesig_string, fontsize=10, fontweight = 'bold')
         #Display height above each data point
         for index, row in points.iterrows():
             ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=5)
@@ -76,6 +79,7 @@ for ws in wb.worksheets:
         fig.tight_layout()
         plt.axis('off')
         image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
+        plt.show()
         plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
 
