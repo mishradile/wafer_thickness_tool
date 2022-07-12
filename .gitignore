@@ -130,3 +130,7 @@ dmypy.json
 
 *.png
 *images/
+
+*$data.xlsx
+*f.py
+*data_copy.xlsx

@@ -1,5 +1,5 @@
 import openpyxl 
-from scipy.interpolate import griddata
+from scipy.interpolate import RBFInterpolator
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,37 +26,37 @@ for ws in wb.worksheets:
     df = pd.DataFrame(ws.values)
    
     points = df.iloc[:,-2:]
+    points = points.to_numpy()
+    # print(points.shape)
+    # print(type(points))
+    # print(points)
     
     #Circle for cropping image, take radius to be furthest distance of any point from origin, to make sure circle fits for all data sets
-    radius_list = (points.iloc[:,0]**2 + points.iloc[:,1]**2)**(0.5)
-    circle = Circle((0, 0), max(radius_list)+5, facecolor='none',
+    radius_list = (points[:,0]**2 + points[:,1]**2)**(0.5)
+    circle = Circle((0, 0), 155, facecolor='none',
              edgecolor=(0, 0, 0), linewidth=2, alpha=0.5)
 
     
     #Loop through each column
     for col_no in range(var_num):
         values = df.iloc[:,col_no]
-
+        values = values.to_numpy()
+        # print(values.shape)
+        # print(type(values))
         
-        #https://docs.scipy.org/doc/scipy/tutorial/interpolate.html
-        grid_x, grid_y = np.mgrid[min(df.iloc[:,-2]):max(df.iloc[:,-2]):200j, min(df.iloc[:,-1]):max(df.iloc[:,-1]):200j]
+        fig, ax = plt.subplots()
         
-        grid_data= griddata(points, values, (grid_x, grid_y), method='cubic', rescale=True)
+        xgrid = np.mgrid[-155: 155:200j, -155: 155:200j]
+        xflat = xgrid.reshape(2, -1).T
+        #possible: gaussian with epsilon 0.01
+        yflat = RBFInterpolator(points, values, kernel='linear')(xflat)
+        ygrid = yflat.reshape(200, 200)
         
-        fig, ax = plt.subplots(figsize=(6, 6))
-        
-        #For some reasons need to copy circle object, if not will error
-        new_circle = copy(circle)
-        #Add patch to crop image into circle
-        ax.add_patch(new_circle)
-        #Plot data points
-        plt.plot(points.iloc[:,0], points.iloc[:,1], 'k.', ms=5)
-        
-        
-        im = plt.imshow(grid_data.T, extent=(min(points.iloc[:,0])-10,max(points.iloc[:,0])+10,min(points.iloc[:,1])-10,max(points.iloc[:,1])+10), origin='lower', cmap = 'jet')
-        im.set_clip_path(new_circle)
-        #Format colorbar to show values to 2 d.p
-        plt.colorbar(format = '%1.0f', shrink =0.75)
+        im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet')
+        # Use line below for point plot to see true value vs interpolated value
+        #p = ax.scatter(*points.T, c=values, s=30, ec='k', cmap='jet')
+        p = ax.scatter(*points.T, s=10, ec='k', c='black')
+        fig.colorbar(im)
         
         #Adding text to plot
         avg = "{:.2f}".format(np.mean(values, axis=0))
@@ -66,21 +66,26 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-150, -170, avg_string, fontsize=10, fontweight = 'bold')
-        ax.text(-30, -170, rng_string, fontsize=10, fontweight = 'bold')
-        ax.text(90, -170, onesig_string, fontsize=10, fontweight = 'bold')
-        #Display height above each data point
-        for index, row in points.iterrows():
+        ax.text(-150, -180, avg_string, fontsize=10, fontweight = 'bold')
+        ax.text(-30, -180, rng_string, fontsize=10, fontweight = 'bold')
+        ax.text(90, -180, onesig_string, fontsize=10, fontweight = 'bold')
+        new_circle = copy(circle)
+        ax.add_patch(new_circle)
+        im.set_clip_path(new_circle)
+        #Display value above each data point
+        points_1 = df.iloc[:,-2:]
+        for index, row in points_1.iterrows():
             ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=5)
         
         
         plt.title('')
         
-        fig.tight_layout()
+        #fig.tight_layout()
         plt.axis('off')
         image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
+        
+        plt.savefig(image_path)
         plt.show()
-        plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
 
 print("Images generated successfully. View results in /images/ folder.")
