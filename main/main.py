@@ -22,7 +22,7 @@ for ws in wb.worksheets:
     #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
     var_num = int(ws.max_column-2)
 
-    # Convert to pandas DataFrame
+    # Convert Excel data to pandas DataFrame
     df = pd.DataFrame(ws.values)
     
     #Circle for cropping image, take radius to be 150 (+4 for aesthetics so that data points won't be clipped)
@@ -36,10 +36,11 @@ for ws in wb.worksheets:
         values = values.to_numpy()
         points = df.iloc[:,-2:]
         points = points.to_numpy()
-        #Check for null/non-numeric values in points coordinates and values
+        #Check for null/non-numeric values in points coordinates and values, ignore errorneous data points, and generate wafer map with remaining values
         valid_points = []
         valid_values = []
         for i in range(len(values)):
+            #TODO: there's probably a better way to do this
             if(isinstance(values[i],float) and isinstance(points[i,0], float) and isinstance(points[i,1], float) and (str(points[i,1]) != 'nan') and (str(points[i,0]) != 'nan') and (str(values[i]) != 'nan')):
                 valid_points.append(points[i])
                 valid_values.append(values[i])
