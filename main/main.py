@@ -27,13 +27,13 @@ for ws in wb.worksheets:
    
     points = df.iloc[:,-2:]
     points = points.to_numpy()
-    print(points.shape)
-    print(type(points))
-    print(points)
+    # print(points.shape)
+    # print(type(points))
+    # print(points)
     
     #Circle for cropping image, take radius to be furthest distance of any point from origin, to make sure circle fits for all data sets
     radius_list = (points[:,0]**2 + points[:,1]**2)**(0.5)
-    circle = Circle((0, 0), max(radius_list)+5, facecolor='none',
+    circle = Circle((0, 0), 155, facecolor='none',
              edgecolor=(0, 0, 0), linewidth=2, alpha=0.5)
 
     
@@ -41,20 +41,22 @@ for ws in wb.worksheets:
     for col_no in range(var_num):
         values = df.iloc[:,col_no]
         values = values.to_numpy()
-        print(values.shape)
-        print(type(values))
+        # print(values.shape)
+        # print(type(values))
         
         fig, ax = plt.subplots()
         
-        xgrid = np.mgrid[-max(radius_list)-10: max(radius_list)+10:200j, -max(radius_list)-10: max(radius_list)+10:200j]
+        xgrid = np.mgrid[-155: 155:200j, -155: 155:200j]
         xflat = xgrid.reshape(2, -1).T
         #possible: gaussian with epsilon 0.01
         yflat = RBFInterpolator(points, values, kernel='linear')(xflat)
         ygrid = yflat.reshape(200, 200)
         
-        im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud')
-        p = ax.scatter(*points.T, c=values, s=30, ec='k',)
-        fig.colorbar(p)
+        im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet')
+        # Use line below for point plot to see true value vs interpolated value
+        #p = ax.scatter(*points.T, c=values, s=30, ec='k', cmap='jet')
+        p = ax.scatter(*points.T, s=10, ec='k', c='black')
+        fig.colorbar(im)
         
         #Adding text to plot
         avg = "{:.2f}".format(np.mean(values, axis=0))
@@ -64,25 +66,26 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-150, -170, avg_string, fontsize=10, fontweight = 'bold')
-        ax.text(-30, -170, rng_string, fontsize=10, fontweight = 'bold')
-        ax.text(90, -170, onesig_string, fontsize=10, fontweight = 'bold')
+        ax.text(-150, -180, avg_string, fontsize=10, fontweight = 'bold')
+        ax.text(-30, -180, rng_string, fontsize=10, fontweight = 'bold')
+        ax.text(90, -180, onesig_string, fontsize=10, fontweight = 'bold')
         new_circle = copy(circle)
         ax.add_patch(new_circle)
         im.set_clip_path(new_circle)
-        #Display height above each data point
+        #Display value above each data point
         points_1 = df.iloc[:,-2:]
         for index, row in points_1.iterrows():
-            ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=10)
+            ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=5)
         
         
         plt.title('')
         
-        fig.tight_layout()
+        #fig.tight_layout()
         plt.axis('off')
         image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
+        
+        plt.savefig(image_path)
         plt.show()
-        plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
 
 print("Images generated successfully. View results in /images/ folder.")
