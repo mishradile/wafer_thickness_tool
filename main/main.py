@@ -31,10 +31,9 @@ for ws in wb.worksheets:
     # print(type(points))
     # print(points)
     
-    #Circle for cropping image, take radius to be furthest distance of any point from origin, to make sure circle fits for all data sets
-    radius_list = (points[:,0]**2 + points[:,1]**2)**(0.5)
-    circle = Circle((0, 0), 155, facecolor='none',
-             edgecolor=(0, 0, 0), linewidth=2, alpha=0.5)
+    #Circle for cropping image, take radius to be 150 (+4 for aesthetics so that data points won't be clipped)
+    circle = Circle((0, 0), 154, facecolor='none',
+             edgecolor=(0, 0, 0), linewidth=1, alpha=1)
 
     
     #Loop through each column
@@ -75,17 +74,17 @@ for ws in wb.worksheets:
         #Display value above each data point
         points_1 = df.iloc[:,-2:]
         for index, row in points_1.iterrows():
-            ax.text(row.iloc[0], row.iloc[1], str( "{:.1f}".format(values[index])), fontsize=5)
+            ax.text(row.iloc[0], row.iloc[1]+2, str( "{:.1f}".format(values[index])), fontsize=5)
         
         
         plt.title('')
         
-        #fig.tight_layout()
+        fig.tight_layout()
         plt.axis('off')
         image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
         
         plt.savefig(image_path)
-        plt.show()
+        #plt.show()
         plt.close()
 
 print("Images generated successfully. View results in /images/ folder.")
