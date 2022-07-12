@@ -132,3 +132,4 @@ dmypy.json
 *images/
 
 *$data.xlsx
+*f.py
