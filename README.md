@@ -21,8 +21,11 @@ For plotting wafer thickness given CSV files
 - If after running the script, terminal shows an error `ValueError: Points cannot contain NaN`, please check that all the data are flushed to the top left corner of each Excel sheets.
 
 ## Usage
-
+Video demo of code usage: 
 https://user-images.githubusercontent.com/105037297/177476376-20421ca0-2e59-4b12-9ef8-6c4915e5fc17.mp4
+Note that if any data points have values/coordinates that are non-numeric or empty in the Excel sheet, it will be ignored by the program, and the wafer map will be generated using the remaining data. A message will be printed to the terminal after the process is completed, listing the worksheets which have empty cells/erroneous values. Please also ensure that data are flushed to the top left corner of each Excel worksheet to avoid generating the error message. 
+![sd](https://user-images.githubusercontent.com/105037297/178438790-266d10e0-b4e9-4c01-be8c-288b52b63ef8.PNG)
+
 
 
 
