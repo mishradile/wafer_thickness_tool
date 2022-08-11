@@ -21,6 +21,8 @@ For plotting wafer thickness given CSV files
 - If after running the script, terminal shows an error `ValueError: Points cannot contain NaN`, please check that all the data are flushed to the top left corner of each Excel sheets.
 
 ## Usage
+The program uses the linear RBFInterpolator (https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RBFInterpolator.html) algorithm to estimate the shape of the wafer given the data points. 
+
 Video demo of code usage: 
 
 https://user-images.githubusercontent.com/105037297/177476376-20421ca0-2e59-4b12-9ef8-6c4915e5fc17.mp4
