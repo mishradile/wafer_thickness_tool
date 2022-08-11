@@ -21,11 +21,12 @@ For plotting wafer thickness given CSV files
 - If after running the script, terminal shows an error `ValueError: Points cannot contain NaN`, please check that all the data are flushed to the top left corner of each Excel sheets.
 
 ## Usage
+Data input will be through the `data.xlsx` Excel file in the `main` folder. Each column should contain the height values of the data points on the wafer, with the last 2 columns containing the (X,Y) coordinates of the data points in each row. An example is shown in the video demo below. 
 The program uses the linear RBFInterpolator (https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RBFInterpolator.html) algorithm to estimate the shape of the wafer given the data points. 
 
 Video demo of code usage: 
 
-https://user-images.githubusercontent.com/105037297/177476376-20421ca0-2e59-4b12-9ef8-6c4915e5fc17.mp4
+https://user-images.githubusercontent.com/105037297/184052571-695c749e-e4cf-4209-9554-5cb881704dde.mp4
 
 Note that if any data points have values/coordinates that are non-numeric or empty in the Excel sheet, it will be ignored by the program, and the wafer map will be generated using the remaining data. A message will be printed to the terminal after the process is completed, listing the worksheets which have empty cells/erroneous values. Please also ensure that data are flushed to the top left corner of each Excel worksheet to avoid generating the error message. 
 
