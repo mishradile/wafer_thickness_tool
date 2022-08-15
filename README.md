@@ -24,6 +24,8 @@ For plotting wafer thickness given CSV files
 Data input will be through the `data.xlsx` Excel file in the `main` folder. Each column should contain the height values of the data points on the wafer, with the last 2 columns containing the (X,Y) coordinates of the data points in each row. An example is shown in the video demo below. 
 The program uses the linear RBFInterpolator (https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RBFInterpolator.html) algorithm to estimate the shape of the wafer given the data points. 
 
+After insertion of data, proceed to the same folder containing the current Excel file to find the `wafer_thickness_tool.bat` file. Double click to start the program. After the terminal prompts that the program has completed, plots produced could be found under the `Images` folder. The naming of the images will be of the format `Spreadsheet name_Column number` E.g. Data from Column B of worksheet named `Site 1` will be named `Site 1_2.png`.
+
 Video demo of code usage: 
 
 https://user-images.githubusercontent.com/105037297/184052571-695c749e-e4cf-4209-9554-5cb881704dde.mp4
