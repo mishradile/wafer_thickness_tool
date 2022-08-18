@@ -8,6 +8,7 @@ For plotting wafer thickness given CSV files
     - Open command line. In Windows, press Windows logo + S to launch search window, and search `cmd`. 
     - In command line, type: `python --version`
     - If Python has been installed, the version that is in your computer will be returned. 
+    
 ![Check python ver](https://user-images.githubusercontent.com/105037297/169487975-c7da6c6f-da46-44d2-bda3-5d8dd35987d7.PNG)
     - If an error message is returned, Python has not been installed. You can download it here: https://www.python.org/downloads/
 - If Python has been installed in your computer, you need to proceed to install the required Python libraries that is needed to run the script. In the command line, type `cd %HOMEPATH%/Desktop/wafer_thickness_tool/` and press Enter. After that, type `pip install -r requirements.txt` and wait for installation to be completed.
