@@ -37,8 +37,6 @@ Terminal output:
 
 ![sd](https://user-images.githubusercontent.com/105037297/178438790-266d10e0-b4e9-4c01-be8c-288b52b63ef8.PNG)
 
-## Assumptions of input data
-- Wafer radius: 150mm
 
 
 
