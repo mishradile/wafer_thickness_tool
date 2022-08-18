@@ -17,6 +17,7 @@ else:
     for f in os.listdir("./images/"):
         os.remove(os.path.join("./images/", f))   
 errored_sheetnames = []
+wafer_radius = int(input("Wafer radius (mm): "))
 for ws in wb.worksheets:
     print("Working on "+str(ws))
     #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
@@ -26,7 +27,7 @@ for ws in wb.worksheets:
     df = pd.DataFrame(ws.values)
     
     #Circle for cropping image, take radius to be 150 (+4 for aesthetics so that data points won't be clipped)
-    circle = Circle((0, 0), 154, facecolor='none',
+    circle = Circle((0, 0), wafer_radius+4, facecolor='none',
              edgecolor=(0, 0, 0), linewidth=1, alpha=1)
 
     
