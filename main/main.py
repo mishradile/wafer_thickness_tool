@@ -21,10 +21,13 @@ wafer_radius = int(input("Wafer radius (mm): "))
 for ws in wb.worksheets:
     print("Working on "+str(ws))
     #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
-    var_num = int(ws.max_column-2)
+    
 
     # Convert Excel data to pandas DataFrame
     df = pd.DataFrame(ws.values)
+    df.dropna(axis=1, how='all', inplace=True)
+    df.dropna(axis=0, how='all', inplace=True)
+    var_num = int(df.shape[1]-2)
     
     #Circle for cropping image, take radius to be 150 (+4 for aesthetics so that data points won't be clipped)
     circle = Circle((0, 0), wafer_radius+4, facecolor='none',
