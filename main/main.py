@@ -25,6 +25,10 @@ for ws in wb.worksheets:
 
     # Convert Excel data to pandas DataFrame
     df = pd.DataFrame(ws.values)
+    
+    col_names = df.iloc[0]
+    #Drop first row with column names
+    df = df.iloc[1:]
     df.dropna(axis=1, how='all', inplace=True)
     df.dropna(axis=0, how='all', inplace=True)
     var_num = int(df.shape[1]-2)
@@ -91,7 +95,7 @@ for ws in wb.worksheets:
         
         fig.tight_layout()
         plt.axis('off')
-        image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_no+1)
+        image_path = "./images/"+ str(re.search(r'.*?\"(.*)".*' , str(ws)).group(1))+"_"+str(col_names[col_no])
         
         plt.savefig(image_path)
         #plt.show()
