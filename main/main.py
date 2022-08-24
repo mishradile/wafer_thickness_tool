@@ -20,11 +20,7 @@ errored_sheetnames = []
 
 for ws in wb.worksheets:
     print("Working on "+str(ws))
-    #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
-    
-    
-    
-    
+
     # Convert Excel data to pandas DataFrame
     df = pd.DataFrame(ws.values)
     
@@ -39,7 +35,6 @@ for ws in wb.worksheets:
         scaling_factor = 0.1
     elif coord_units=="μm":
         scaling_factor = 1000
-    wafer_radius = wafer_radius * scaling_factor
     
     col_names = df.iloc[0]
     #Drop first row with column names
@@ -75,9 +70,12 @@ for ws in wb.worksheets:
                     errored_sheetnames.append(str(ws))
         points = np.array(valid_points)
         values = np.array(valid_values)
+        #Scaling factor to adjust for difference in units between coordinates and wafer radius 
+        points /= scaling_factor
+        
         fig, ax = plt.subplots()
         
-        xgrid = np.mgrid[-155: 155:200j, -155: 155:200j]
+        xgrid = np.mgrid[-wafer_radius-5: wafer_radius+5:200j, -wafer_radius-5: wafer_radius+5:200j]
         xflat = xgrid.reshape(2, -1).T
         #possible: gaussian with epsilon 0.01
         yflat = RBFInterpolator(points, values, kernel='linear')(xflat)
@@ -106,9 +104,10 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-150, -180, avg_string, fontsize=10, fontweight = 'bold')
-        ax.text(-30, -180, rng_string, fontsize=10, fontweight = 'bold')
-        ax.text(90, -180, onesig_string, fontsize=10, fontweight = 'bold')
+        #Figtext instead of .text so that text position is independent of axes (wafer radius)
+        plt.figtext(0.05, 0.03, avg_string, fontsize=10, fontweight = 'bold')
+        plt.figtext(0.35, 0.03, rng_string, fontsize=10, fontweight = 'bold')
+        plt.figtext(0.65, 0.03, onesig_string, fontsize=10, fontweight = 'bold')
         new_circle = copy(circle)
         ax.add_patch(new_circle)
         im.set_clip_path(new_circle)
