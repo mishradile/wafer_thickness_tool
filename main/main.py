@@ -17,20 +17,33 @@ else:
     for f in os.listdir("./images/"):
         os.remove(os.path.join("./images/", f))   
 errored_sheetnames = []
-wafer_radius = int(input("Wafer radius (mm): "))
+
 for ws in wb.worksheets:
     print("Working on "+str(ws))
-    #Find the number of variables to be plotted - Number of columns minus the x, y coordinates columns
-    
 
     # Convert Excel data to pandas DataFrame
     df = pd.DataFrame(ws.values)
+    
+    #Values set by users
+    wafer_radius = float(df.iloc[0,14])
+    coord_units = df.iloc[1,14]
+    colorbar_range = str(df.iloc[2,14])
+    
+    #Scale wafer_radius and coord_units appropriately
+    scaling_factor =1
+    if coord_units=="cm":
+        scaling_factor = 0.1
+    elif coord_units=="μm":
+        scaling_factor = 1000
     
     col_names = df.iloc[0]
     #Drop first row with column names
     df = df.iloc[1:]
     df.dropna(axis=1, how='all', inplace=True)
     df.dropna(axis=0, how='all', inplace=True)
+    #Drop the settings columns
+    df = df.iloc[:,:-3]
+    #Find number of plots to make
     var_num = int(df.shape[1]-2)
     
     #Circle for cropping image, take radius to be 150 (+4 for aesthetics so that data points won't be clipped)
@@ -57,15 +70,27 @@ for ws in wb.worksheets:
                     errored_sheetnames.append(str(ws))
         points = np.array(valid_points)
         values = np.array(valid_values)
+        #Scaling factor to adjust for difference in units between coordinates and wafer radius 
+        points /= scaling_factor
+        
         fig, ax = plt.subplots()
         
-        xgrid = np.mgrid[-155: 155:200j, -155: 155:200j]
+        xgrid = np.mgrid[-wafer_radius-5: wafer_radius+5:200j, -wafer_radius-5: wafer_radius+5:200j]
         xflat = xgrid.reshape(2, -1).T
         #possible: gaussian with epsilon 0.01
         yflat = RBFInterpolator(points, values, kernel='linear')(xflat)
         ygrid = yflat.reshape(200, 200)
         
-        im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet')
+        #.lower() so that user's caps choice won't matter
+        if colorbar_range.lower() in ["auto", "none"]:
+            im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet')
+        else:
+            min_val = min(values)
+            try:
+                im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet', vmin = min_val, vmax = min_val+int(colorbar_range))
+            except ValueError:
+                print("Error: Please ensure colobar range entered is decimal without spaces.")
+            
         # Use line below for point plot to see true value vs interpolated value
         #p = ax.scatter(*points.T, c=values, s=30, ec='k', cmap='jet')
         p = ax.scatter(*points.T, s=10, ec='k', c='black')
@@ -79,9 +104,10 @@ for ws in wb.worksheets:
         avg_string = 'Average: '+str(avg)
         rng_string = '±Range: '+str(rng)
         onesig_string = '1Sig: '+ str(onesig)+"%"
-        ax.text(-150, -180, avg_string, fontsize=10, fontweight = 'bold')
-        ax.text(-30, -180, rng_string, fontsize=10, fontweight = 'bold')
-        ax.text(90, -180, onesig_string, fontsize=10, fontweight = 'bold')
+        #Figtext instead of .text so that text position is independent of axes (wafer radius)
+        plt.figtext(0.05, 0.03, avg_string, fontsize=10, fontweight = 'bold')
+        plt.figtext(0.35, 0.03, rng_string, fontsize=10, fontweight = 'bold')
+        plt.figtext(0.65, 0.03, onesig_string, fontsize=10, fontweight = 'bold')
         new_circle = copy(circle)
         ax.add_patch(new_circle)
         im.set_clip_path(new_circle)
