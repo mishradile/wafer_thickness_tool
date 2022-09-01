@@ -114,7 +114,9 @@ for ws in wb.worksheets:
         points_1 = pd.DataFrame(points)
         for index, row in points_1.iterrows():
             ax.text(row.iloc[0], row.iloc[1]+2, str( "{:.1f}".format(values[index])), fontsize=5)
-        
+            
+        #Add triangular notch at bottom of wafer
+        plt.plot([-wafer_radius-2], "^:w")
         
         plt.title('')
         
