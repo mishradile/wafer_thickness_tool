@@ -26,7 +26,8 @@ for ws in wb.worksheets:
     #Values set by users
     wafer_radius = float(df.iloc[0,14])
     coord_units = df.iloc[1,14]
-    colorbar_range = str(df.iloc[2,14])
+    colorbar_min = str(df.iloc[2,14])
+    colorbar_max = str(df.iloc[3,14])
     
     #Scale wafer_radius and coord_units appropriately
     scaling_factor =1
@@ -81,14 +82,12 @@ for ws in wb.worksheets:
         ygrid = yflat.reshape(200, 200)
         
         #.lower() so that user's caps choice won't matter
-        if colorbar_range.lower() in ["auto", "none"]:
-            im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet')
-        else:
-            min_val = min(values)
-            try:
-                im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet', vmin = min_val, vmax = min_val+int(colorbar_range))
-            except ValueError:
-                print("Error: Please ensure colobar range entered is decimal without spaces.")
+        vmin = None if colorbar_min.lower() in ["auto", "none"] else int(colorbar_min)
+        vmax = None if colorbar_max.lower() in ["auto", "none"] else int(colorbar_max)
+        try:
+            im = ax.pcolormesh(*xgrid, ygrid, shading='gouraud', cmap='jet', vmin = vmin, vmax = vmax)
+        except ValueError:
+            print("Error: Please ensure colobar range entered is decimal without spaces.")
             
         # Use line below for point plot to see true value vs interpolated value
         #p = ax.scatter(*points.T, c=values, s=30, ec='k', cmap='jet')
